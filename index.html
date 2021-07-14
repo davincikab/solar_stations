@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Installation Stations</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin=""/>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: cursive;
+            letter-spacing: 0.3px;
+        }
+
+        .map-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow:hidden;
+        }
+
+        /* search section */
+        .search-tab {
+            position: absolute;
+            z-index: 1;
+            background-color: #fff;
+            box-shadow: 0px 0px 1px 2px #aaaaaa;
+            display: flex;
+            padding: 0.3em 0.25em;
+            border-radius: 3px;
+            top: 3%;
+            left: 30%;
+            width: 30vw;
+        }
+
+        .search-tab .search-section {
+            display: flex;
+            align-items: center;
+            /* background-color: #29768a; */
+            margin-left: 1em;
+            padding:0 0.75em;
+            width: 100%;
+        }
+
+        .search-section i {
+            font-size: 1.2rem;
+            color:white;
+        }
+
+        .search-section .form-control {
+            background: transparent;
+            border: none;
+            color:#333;
+            height: 20px;
+            width: 100%;
+        }
+
+        ::placeholder {
+            color:#333;
+        }
+
+        .search-section .form-control:focus {
+            outline: none;
+            background-color: white;
+            color:#333;
+        }
+
+        .search-suggestions {
+            position: absolute;
+            top: 110%;
+            left: 0%;
+            width:100%;
+            max-height: 250px;
+            overflow-y: auto;
+            background-color:white;
+        }
+
+        .suggestion-item {
+            color: #20374C;
+            cursor: pointer;
+            padding: 0.5em;
+            font-size: 1em;
+            list-style: none;
+            background-color: white;
+            border-bottom: 0.3px solid #e4e4e4;
+        }
+
+        .search-suggestions.collapse {
+            display: none;
+        }
+
+        .suggestion-item:hover {
+            background-color:#20374C;
+            color:white;
+        }
+
+        /* map */
+        #map {
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+        }
+
+        .marker-cluster {
+            background-color: rgba(110, 204, 57, 0.4);
+        }
+
+        .marker-cluster div {
+            background-color: rgba(110, 204, 57, 0.6);
+        }
+
+        .div-icon {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: blueviolet;
+            box-shadow: 0px 0px 0.2em rgb(54, 52, 52);
+        }
+
+        .leaflet-touch .leaflet-control-layers, .leaflet-touch .leaflet-bar {
+           border:none !important;
+        }
+
+        .leaflet-touch .leaflet-bar a {
+            margin:4px 0px;
+            border-radius: 50% !important;
+            box-shadow: 0px 0px 0.2em rgb(54, 52, 52);
+        }
+
+        .leaflet-popup-content-wrapper {
+            border-radius: 2px !important;
+            padding: 0;
+        }
+
+        .leaflet-popup-content {
+            margin: 0px !important;
+            line-height: 1.4;
+        }
+
+        .popup {
+            width:200px;
+            max-width: 250px;
+        }
+
+        .popup-header {
+            padding:0.2em 1.2em;
+            background:#333;
+            color:white;
+            font-size: 1rem;
+            letter-spacing: 0.4px;
+            text-align: center;
+        }
+
+        .popup-body {
+            padding:4px 6px;
+        }
+
+        .description-section {
+            width: 380px;
+            position: absolute;
+            right:-380px;
+            top:0;
+            height: 100vh;
+            z-index: 2;
+            background-color: white;
+            box-shadow: 0px 0px 0.3em #555;
+            overflow-y: auto;
+            transition: 0.3s all;
+        }
+
+        .description-section .close-btn {
+            position: absolute;
+            right: 0%;
+            top: 0%;
+            font-size: 30px;
+            padding: 0 5px;
+            cursor: pointer;
+        }
+
+        .description-section.open {
+            right: 0px !important;
+        }
+
+        .description-section .section-header {
+            text-align: center;
+            background-color: #ddd;
+            font-size: 18px;
+            padding: 0.5em 0.375em;
+            font-weight: 700;
+        }
+
+        .section-info {
+            padding:1em 0.5rem;
+            line-height: 1.2;
+        }
+
+        .item {
+            margin:0.5rem 0;
+        }
+
+        .item .item-header {
+            background-color: rgb(173, 173, 173);
+            color:white;
+            padding: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .item p {
+            margin:0;
+        }
+
+        .image-section {
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 4px;
+            padding: 0.2em;
+        }
+
+        .image-section img {
+            width: 100%;
+            height: auto;
+        }
+
+        @media(max-width:480px) {
+            .search-tab {
+                width: 60vw;
+                left:15vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="map-container">
+        <div class="search-tab">
+            <div class="search-section">
+                <input type="text" name="station-query" value="" id="station-query" class="form-control" placeholder="Search Stations ">
+            </div>
+            <div class="search-suggestions" id="station-suggestion"></div>
+        </div>
+
+        <div id="map"></div>     
+        <div class="description-section" id="description-section">
+            <div class="close-btn" id="close-btn">&times;</div>
+
+            <div id="description-body"></div>
+        </div>   
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+   crossorigin=""></script>
+
+   <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+   <script src="https://d3js.org/d3.v7.min.js"></script>
+   <script src="main.js"></script>
+</body>
+</html>
