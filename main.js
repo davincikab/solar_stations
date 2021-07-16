@@ -51,7 +51,9 @@ d3.csv('stations.csv')
 function getMarkers(data) {
     data.map(station => {
         let icon = L.divIcon({
-            className:'div-icon'
+            className:'div-icon',
+            html:'<div class="marker-icon"></div><span>' + station.Name + '</span>',
+            popupAnchor: [80, -4],
         });
 
         let popupContent = getPopupContent(station);
@@ -63,7 +65,7 @@ function getMarkers(data) {
             icon:icon, 
             title:station.Name,
             id:station.id
-        }).bindPopup(popupContent);
+        }).bindPopup(popupContent)
 
         marker.on('click', function(e) {
             console.log("Marker was clicked");
