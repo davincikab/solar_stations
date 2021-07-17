@@ -8,8 +8,9 @@ closeButton.onclick = function(e) {
 var stationsData = [];
 
 var map = L.map('map', {
-    center:[-18.009669, 31.080442],
-    zoom:17
+    center:[-19.059584066849833, 29.884604889741752],
+    zoom:6.5,
+    zoomDelta:0.5
 });
 
 let layer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}' + (L.Browser.retina ? '@2x.png' : '.png'), {
