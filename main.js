@@ -47,7 +47,7 @@ var layers = {
     }
 };
 
-L.control.layers(layers.baseLayers, layers.overlays).addTo(map);
+L.control.layers(layers.baseLayers, layers.overlays, {collapsed:false}).addTo(map);
 
 // load the csv data
 d3.csv('stations.csv')
