@@ -20,7 +20,14 @@ let layer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{
    minZoom: 0
 });
 
-layer.addTo(map);
+// layer.addTo(map);
+
+var satelliteLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+    maxZoom: 20,
+    subdomains:['mt0','mt1','mt2','mt3']
+});
+
+satelliteLayer.addTo(map);
 
 let markers = [];
 let stations = L.markerClusterGroup({
@@ -28,6 +35,19 @@ let stations = L.markerClusterGroup({
     //     return L.divIcon({html:`<div class="marker-cluster"><div>${cluster.getChildCount()}</div></div>`})
     // }
 });
+
+
+var layers = {
+    baseLayers:{
+        "Map":layer,
+        "Satellite":satelliteLayer
+    },
+    overlays:{
+        "Solar Station":stations
+    }
+};
+
+L.control.layers(layers.baseLayers, layers.overlays).addTo(map);
 
 // load the csv data
 d3.csv('stations.csv')
@@ -45,7 +65,7 @@ d3.csv('stations.csv')
     // console.log(markers);
     // stations.addLayers(markers);
 
-    map.addLayer(stations);
+   map.addLayer(stations);
 })
 .catch(error => console.error);
 
